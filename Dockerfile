@@ -1,10 +1,10 @@
-# Base runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# Base runtime .NET 9
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-# Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Build com SDK do .NET 9
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet restore
