@@ -14,4 +14,6 @@ RUN dotnet publish -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+# Define a variável de ambiente PORT para o Render (opcional, mas deixa explícito)
+ENV PORT=80
 ENTRYPOINT ["dotnet", "MotoMonitoramento.dll"]

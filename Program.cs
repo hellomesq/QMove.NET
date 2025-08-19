@@ -13,6 +13,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Pega a porta que o Render fornece
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+app.Urls.Add($"http://*:{port}");
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
