@@ -3697,24 +3697,32 @@
     ]
   },
   "packageFolders": {
-    "/home/heloisa/.nuget/packages/": {}
+    "C:\\Users\\labsfiap\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/heloisa/RiderProjects/MotoMonitoramento/MotoMonitoramento/MotoMonitoramento.csproj",
+      "projectUniqueName": "C:\\Users\\labsfiap\\Downloads\\challenge\\QMove.NET\\MotoMonitoramento.csproj",
       "projectName": "MotoMonitoramento",
-      "projectPath": "/home/heloisa/RiderProjects/MotoMonitoramento/MotoMonitoramento/MotoMonitoramento.csproj",
-      "packagesPath": "/home/heloisa/.nuget/packages/",
-      "outputPath": "/home/heloisa/RiderProjects/MotoMonitoramento/MotoMonitoramento/obj/",
+      "projectPath": "C:\\Users\\labsfiap\\Downloads\\challenge\\QMove.NET\\MotoMonitoramento.csproj",
+      "packagesPath": "C:\\Users\\labsfiap\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\labsfiap\\Downloads\\challenge\\QMove.NET\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/heloisa/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\labsfiap\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3733,7 +3741,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -3783,7 +3791,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

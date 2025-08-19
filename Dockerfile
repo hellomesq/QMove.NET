@@ -1,23 +1,17 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# Base runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
+EXPOSE 80
 
-COPY *.csproj ./
+# Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY . .
 RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
 
-COPY . ./
-RUN dotnet publish -c Release -o out
-
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
+# Final
+FROM base AS final
 WORKDIR /app
-
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-COPY --from=build /app/out ./
-
-EXPOSE 5082
-
-ENV ASPNETCORE_URLS=http://+:5082
-
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "MotoMonitoramento.dll"]
-
