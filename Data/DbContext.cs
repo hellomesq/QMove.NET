@@ -10,5 +10,6 @@ namespace MotoMonitoramento.Data
         }
 
         public DbSet<Moto> Motos { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
     }
 }
