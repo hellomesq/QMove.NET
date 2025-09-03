@@ -7,13 +7,13 @@ namespace MotoMonitoramento.Models
         public int Id { get; set; }
 
         [Required]
-        public string Nome { get; set; }
+        public required string Nome { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public required string Email { get; set; }
 
         [Required]
-        public string Senha { get; set; }
+        public required string Senha { get; set; }
     }
 }
