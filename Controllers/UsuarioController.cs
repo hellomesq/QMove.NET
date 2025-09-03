@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;   
 using MotoMonitoramento.Models;
 
-namespace YourNamespace.Controllers
+namespace MotoMonitoramento.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
