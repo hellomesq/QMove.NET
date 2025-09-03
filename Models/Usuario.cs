@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace YourNamespace.Models
+namespace MotoMonitoramento.Models
 {
     public class Usuario
     {

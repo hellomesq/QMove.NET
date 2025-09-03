@@ -11,7 +11,7 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace MotoMonitoramento.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250521035243_InitialCreate")]
+    [Migration("20250903022922_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,19 +34,47 @@ namespace MotoMonitoramento.Migrations
 
                     b.Property<string>("Placa")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)");
+                        .HasMaxLength(10)
+                        .HasColumnType("NVARCHAR2(10)");
 
                     b.Property<string>("Setor")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)");
+                        .HasMaxLength(20)
+                        .HasColumnType("NVARCHAR2(20)");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("NVARCHAR2(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Motos");
+                });
+
+            modelBuilder.Entity("MotoMonitoramento.Models.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)");
+
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("Senha")
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Motos");
+                    b.ToTable("Usuarios");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using YourNamespace.Data;
-using YourNamespace.Models;
+using MotoMonitoramento.Data;   
+using MotoMonitoramento.Models;
 
 namespace YourNamespace.Controllers
 {
