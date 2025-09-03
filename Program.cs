@@ -17,8 +17,16 @@ var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
 app.Urls.Add($"http://*:{port}");
 
+// Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// Redireciona a raiz para o Swagger
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
 
 app.UseAuthorization();
 app.MapControllers();
