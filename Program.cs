@@ -7,15 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
 
-// Adiciona suporte a CORS
+// CORS - permite requisições de qualquer origem (útil para testes web e mobile)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()   // Permite qualquer origem (web, app, etc)
-              .AllowAnyMethod()   // Permite GET, POST, PUT, DELETE...
-              .AllowAnyHeader();  // Permite qualquer cabeçalho
-    });
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
 });
 
 builder.Services.AddControllers();
@@ -24,25 +22,26 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Pega a porta que o Render fornece
-var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
-app.Urls.Add($"http://*:{port}");
-
-// Habilita CORS antes de MapControllers
+// Ativa CORS
 app.UseCors("AllowAll");
 
 // Swagger
 app.UseSwagger();
-app.UseSwaggerUI();
-
-// Redireciona a raiz para o Swagger
-app.MapGet("/", context =>
+app.UseSwaggerUI(c =>
 {
-    context.Response.Redirect("/swagger");
-    return Task.CompletedTask;
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "QMove API v1");
+    c.RoutePrefix = "swagger"; // mantém index.html em /swagger/index.html
 });
 
+// Opcional: raiz apenas para testar
+app.MapGet("/", () => "API QMove funcionando");
+
+// Autorizações e Controllers
 app.UseAuthorization();
 app.MapControllers();
+
+// Render usa variável de ambiente PORT
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+app.Urls.Add($"http://*:{port}");
 
 app.Run();
