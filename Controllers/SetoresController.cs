@@ -24,5 +24,42 @@ namespace MotoMonitoramento.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = setor.Id }, setor);
         }
+
+        // PUT: api/setores/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Setor setor)
+        {
+            if (id != setor.Id)
+                return BadRequest();
+
+            _context.Entry(setor).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Setores.Any(s => s.Id == id))
+                    return NotFound();
+                else
+                    throw;
+            }
+
+            return NoContent();
+        }
+
+        // DELETE: api/setores/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var setor = await _context.Setores.FindAsync(id);
+            if (setor == null)
+                return NotFound();
+
+            _context.Setores.Remove(setor);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

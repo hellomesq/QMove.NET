@@ -45,6 +45,16 @@ namespace MotoMonitoramento.Controllers
         [HttpPost]
         public async Task<ActionResult<Moto>> Create(Moto moto)
         {
+            if (moto.Setor != null)
+            {
+                // procura setor existente pelo nome
+                var setor = await _context.Setores.FirstOrDefaultAsync(s =>
+                    s.Nome == moto.Setor.Nome
+                );
+                if (setor != null)
+                    moto.SetorId = setor.Id;
+            }
+
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new { id = moto.Id }, moto);
