@@ -46,17 +46,19 @@ namespace MotoMonitoramento.Controllers
         [HttpPost]
         public async Task<ActionResult<Moto>> Create([FromBody] MotoDto dto)
         {
-            // procura setor pelo nome informado
-            var setor = await _context.Setores.FirstOrDefaultAsync(s => s.Nome == dto.SetorNome);
+            // Sempre começa no setor "Disponível"
+            var setorDisponivel = await _context.Setores.FirstOrDefaultAsync(s =>
+                s.Nome == "Disponível"
+            );
 
-            if (setor == null)
-                return BadRequest($"Setor '{dto.SetorNome}' não encontrado.");
+            if (setorDisponivel == null)
+                return BadRequest("Setor 'Disponível' não encontrado. Cadastre-o primeiro.");
 
             var moto = new Moto
             {
                 Placa = dto.Placa,
                 Status = dto.Status,
-                SetorId = setor.Id,
+                SetorId = setorDisponivel.Id,
             };
 
             _context.Motos.Add(moto);
@@ -66,25 +68,28 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] MotoDto dto)
+        public async Task<IActionResult> Update(
+            int id,
+            [FromBody] MotoDto dto,
+            [FromQuery] int? setorId
+        )
         {
             var moto = await _context.Motos.FindAsync(id);
             if (moto == null)
                 return NotFound();
 
-            // procura setor pelo nome
-            var setor = await _context.Setores.FirstOrDefaultAsync(s => s.Nome == dto.SetorNome);
-
-            if (setor == null)
-                return BadRequest($"Setor '{dto.SetorNome}' não encontrado.");
-
-            // atualiza os campos
             moto.Placa = dto.Placa;
             moto.Status = dto.Status;
-            moto.SetorId = setor.Id;
+
+            if (setorId.HasValue)
+            {
+                var setor = await _context.Setores.FindAsync(setorId.Value);
+                if (setor == null)
+                    return BadRequest("Setor informado não existe.");
+                moto.SetorId = setor.Id;
+            }
 
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 

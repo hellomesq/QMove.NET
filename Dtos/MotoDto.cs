@@ -4,6 +4,5 @@ namespace MotoMonitoramento.Dtos
     {
         public string Placa { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
-        public string SetorNome { get; set; } = string.Empty;
     }
 }
