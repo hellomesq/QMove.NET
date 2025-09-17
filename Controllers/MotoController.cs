@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
 using MotoMonitoramento.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace MotoMonitoramento.Controllers
 {
@@ -21,10 +21,17 @@ namespace MotoMonitoramento.Controllers
         public async Task<ActionResult<IEnumerable<Moto>>> GetAll() =>
             await _context.Motos.ToListAsync();
 
-        // GET: api/motos/por-setor?setor=A
+        // GET: api/motos/por-setor?setorId=1
         [HttpGet("por-setor")]
-        public async Task<ActionResult<IEnumerable<Moto>>> GetPorSetor([FromQuery] string setor) =>
-            await _context.Motos.Where(m => m.Setor == setor).ToListAsync();
+        public async Task<ActionResult<IEnumerable<Moto>>> GetPorSetor([FromQuery] int setorId)
+        {
+            var motos = await _context
+                .Motos.Include(m => m.Setor) // inclui dados do setor
+                .Where(m => m.SetorId == setorId)
+                .ToListAsync();
+
+            return motos;
+        }
 
         // GET: api/motos/5
         [HttpGet("{id}")]
@@ -81,7 +88,6 @@ namespace MotoMonitoramento.Controllers
             return NoContent();
         }
 
-        private bool MotoExists(int id) =>
-            _context.Motos.Any(m => m.Id == id);
+        private bool MotoExists(int id) => _context.Motos.Any(m => m.Id == id);
     }
 }
