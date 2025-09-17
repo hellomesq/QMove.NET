@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
+using MotoMonitoramento.Dtos;
 using MotoMonitoramento.Models;
 
 namespace MotoMonitoramento.Controllers
@@ -43,43 +44,46 @@ namespace MotoMonitoramento.Controllers
 
         // POST: api/motos
         [HttpPost]
-        public async Task<ActionResult<Moto>> Create(Moto moto)
+        public async Task<ActionResult<Moto>> Create([FromBody] MotoDto dto)
         {
-            if (moto.Setor != null)
+            // procura setor pelo nome informado
+            var setor = await _context.Setores.FirstOrDefaultAsync(s => s.Nome == dto.SetorNome);
+
+            if (setor == null)
+                return BadRequest($"Setor '{dto.SetorNome}' não encontrado.");
+
+            var moto = new Moto
             {
-                // procura setor existente pelo nome
-                var setor = await _context.Setores.FirstOrDefaultAsync(s =>
-                    s.Nome == moto.Setor.Nome
-                );
-                if (setor != null)
-                    moto.SetorId = setor.Id;
-            }
+                Placa = dto.Placa,
+                Status = dto.Status,
+                SetorId = setor.Id,
+            };
 
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetById), new { id = moto.Id }, moto);
         }
 
-        // PUT: api/motos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Moto moto)
+        public async Task<IActionResult> Update(int id, [FromBody] MotoDto dto)
         {
-            if (id != moto.Id)
-                return BadRequest();
+            var moto = await _context.Motos.FindAsync(id);
+            if (moto == null)
+                return NotFound();
 
-            _context.Entry(moto).State = EntityState.Modified;
+            // procura setor pelo nome
+            var setor = await _context.Setores.FirstOrDefaultAsync(s => s.Nome == dto.SetorNome);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MotoExists(id))
-                    return NotFound();
-                else
-                    throw;
-            }
+            if (setor == null)
+                return BadRequest($"Setor '{dto.SetorNome}' não encontrado.");
+
+            // atualiza os campos
+            moto.Placa = dto.Placa;
+            moto.Status = dto.Status;
+            moto.SetorId = setor.Id;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

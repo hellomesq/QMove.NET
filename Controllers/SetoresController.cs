@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
+using MotoMonitoramento.DTOs;
 using MotoMonitoramento.Models;
 
 namespace MotoMonitoramento.Controllers
@@ -18,21 +19,24 @@ namespace MotoMonitoramento.Controllers
             await _context.Setores.ToListAsync();
 
         [HttpPost]
-        public async Task<ActionResult<Setor>> Create(Setor setor)
+        public async Task<ActionResult<Setor>> Create(SetorDto dto)
         {
+            var setor = new Setor { Nome = dto.Nome };
             _context.Setores.Add(setor);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAll), new { id = setor.Id }, setor);
         }
 
         // PUT: api/setores/5
+        // PUT: api/setores/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Setor setor)
+        public async Task<IActionResult> Update(int id, SetorDto dto)
         {
-            if (id != setor.Id)
-                return BadRequest();
+            var setor = await _context.Setores.FindAsync(id);
+            if (setor == null)
+                return NotFound();
 
-            _context.Entry(setor).State = EntityState.Modified;
+            setor.Nome = dto.Nome;
 
             try
             {
