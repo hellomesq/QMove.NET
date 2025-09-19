@@ -19,16 +19,40 @@ namespace MotoMonitoramento.Controllers
 
         // GET: api/motos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Moto>>> GetAll() =>
-            await _context.Motos.ToListAsync();
+        public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetAll()
+        {
+            var motos = await _context
+                .Motos.Include(m => m.Setor)
+                .Select(m => new MotoResponseDto
+                {
+                    Id = m.Id,
+                    Placa = m.Placa,
+                    Status = m.Status,
+                    SetorId = m.SetorId,
+                    SetorNome = m.Setor != null ? m.Setor.Nome : null,
+                })
+                .ToListAsync();
+
+            return motos;
+        }
 
         // GET: api/motos/por-setor?setorId=1
         [HttpGet("por-setor")]
-        public async Task<ActionResult<IEnumerable<Moto>>> GetPorSetor([FromQuery] int setorId)
+        public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetPorSetor(
+            [FromQuery] int setorId
+        )
         {
             var motos = await _context
-                .Motos.Include(m => m.Setor) // inclui dados do setor
+                .Motos.Include(m => m.Setor)
                 .Where(m => m.SetorId == setorId)
+                .Select(m => new MotoResponseDto
+                {
+                    Id = m.Id,
+                    Placa = m.Placa,
+                    Status = m.Status,
+                    SetorId = m.SetorId,
+                    SetorNome = m.Setor != null ? m.Setor.Nome : null,
+                })
                 .ToListAsync();
 
             return motos;
@@ -36,43 +60,64 @@ namespace MotoMonitoramento.Controllers
 
         // GET: api/motos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Moto>> GetById(int id)
+        public async Task<ActionResult<MotoResponseDto>> GetById(int id)
         {
-            var moto = await _context.Motos.FindAsync(id);
+            var moto = await _context
+                .Motos.Include(m => m.Setor)
+                .Where(m => m.Id == id)
+                .Select(m => new MotoResponseDto
+                {
+                    Id = m.Id,
+                    Placa = m.Placa,
+                    Status = m.Status,
+                    SetorId = m.SetorId,
+                    SetorNome = m.Setor != null ? m.Setor.Nome : null,
+                })
+                .FirstOrDefaultAsync();
+
             return moto == null ? NotFound() : Ok(moto);
         }
 
         // POST: api/motos
         [HttpPost]
-        public async Task<ActionResult<Moto>> Create([FromBody] MotoDto dto)
+        public async Task<ActionResult<MotoResponseDto>> Create([FromBody] MotoDto dto)
         {
-            // Sempre começa no setor "Disponível"
-            var setorDisponivel = await _context.Setores.FirstOrDefaultAsync(s =>
-                s.Nome == "Disponível"
+            if (string.IsNullOrWhiteSpace(dto.SetorNome))
+                return BadRequest("Informe o nome do setor.");
+
+            // Busca ignorando maiúsculas/minúsculas
+            var setor = await _context.Setores.FirstOrDefaultAsync(s =>
+                EF.Functions.Like(s.Nome, dto.SetorNome.Trim())
             );
 
-            if (setorDisponivel == null)
-                return BadRequest("Setor 'Disponível' não encontrado. Cadastre-o primeiro.");
+            if (setor == null)
+                return BadRequest($"Setor '{dto.SetorNome}' não encontrado. Cadastre-o primeiro.");
 
             var moto = new Moto
             {
                 Placa = dto.Placa,
                 Status = dto.Status,
-                SetorId = setorDisponivel.Id,
+                SetorId = setor.Id,
             };
 
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = moto.Id }, moto);
+            var response = new MotoResponseDto
+            {
+                Id = moto.Id,
+                Placa = moto.Placa,
+                Status = moto.Status,
+                SetorId = moto.SetorId,
+                SetorNome = setor.Nome,
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = moto.Id }, response);
         }
 
+        // PUT: api/motos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(
-            int id,
-            [FromBody] MotoDto dto,
-            [FromQuery] int? setorId
-        )
+        public async Task<IActionResult> Update(int id, [FromBody] MotoDto dto)
         {
             var moto = await _context.Motos.FindAsync(id);
             if (moto == null)
@@ -81,11 +126,15 @@ namespace MotoMonitoramento.Controllers
             moto.Placa = dto.Placa;
             moto.Status = dto.Status;
 
-            if (setorId.HasValue)
+            if (!string.IsNullOrWhiteSpace(dto.SetorNome))
             {
-                var setor = await _context.Setores.FindAsync(setorId.Value);
+                var setor = await _context.Setores.FirstOrDefaultAsync(s =>
+                    EF.Functions.Like(s.Nome, dto.SetorNome.Trim())
+                );
+
                 if (setor == null)
-                    return BadRequest("Setor informado não existe.");
+                    return BadRequest($"Setor '{dto.SetorNome}' não encontrado.");
+
                 moto.SetorId = setor.Id;
             }
 
@@ -106,7 +155,5 @@ namespace MotoMonitoramento.Controllers
 
             return NoContent();
         }
-
-        private bool MotoExists(int id) => _context.Motos.Any(m => m.Id == id);
     }
 }
