@@ -18,16 +18,15 @@ namespace MotoMonitoramento.Controllers
         public async Task<ActionResult<IEnumerable<Setor>>> GetAll() =>
             await _context.Setores.ToListAsync();
 
-        [HttpPost]
-        public async Task<ActionResult<Setor>> Create(SetorDto dto)
+        [HttpPost("setores")]
+        public async Task<ActionResult<Setor>> CadastrarSetor([FromBody] string nome)
         {
-            var setor = new Setor { Nome = dto.Nome };
+            var setor = new Setor { Nome = nome };
             _context.Setores.Add(setor);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetAll), new { id = setor.Id }, setor);
+            return Ok(setor);
         }
 
-        // PUT: api/setores/5
         // PUT: api/setores/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, SetorDto dto)

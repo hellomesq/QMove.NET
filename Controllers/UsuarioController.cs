@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MotoMonitoramento.Data;   
+using MotoMonitoramento.Data;
 using MotoMonitoramento.Models;
 
 namespace MotoMonitoramento.Controllers

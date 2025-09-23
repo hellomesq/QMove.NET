@@ -27,7 +27,6 @@ namespace MotoMonitoramento.Controllers
                 {
                     Id = m.Id,
                     Placa = m.Placa,
-                    Status = m.Status,
                     SetorId = m.SetorId,
                     SetorNome = m.Setor != null ? m.Setor.Nome : null,
                 })
@@ -49,7 +48,6 @@ namespace MotoMonitoramento.Controllers
                 {
                     Id = m.Id,
                     Placa = m.Placa,
-                    Status = m.Status,
                     SetorId = m.SetorId,
                     SetorNome = m.Setor != null ? m.Setor.Nome : null,
                 })
@@ -69,7 +67,6 @@ namespace MotoMonitoramento.Controllers
                 {
                     Id = m.Id,
                     Placa = m.Placa,
-                    Status = m.Status,
                     SetorId = m.SetorId,
                     SetorNome = m.Setor != null ? m.Setor.Nome : null,
                 })
@@ -79,40 +76,28 @@ namespace MotoMonitoramento.Controllers
         }
 
         // POST: api/motos
-        [HttpPost]
-        public async Task<ActionResult<MotoResponseDto>> Create([FromBody] MotoDto dto)
+        [HttpPost("motos")]
+        public async Task<ActionResult<MotoDto>> CadastrarMoto(
+            [FromQuery] string placa,
+            [FromQuery] int setorId
+        )
         {
-            if (string.IsNullOrWhiteSpace(dto.SetorNome))
-                return BadRequest("Informe o nome do setor.");
-
-            // Busca ignorando maiúsculas/minúsculas
-            var setor = await _context.Setores.FirstOrDefaultAsync(s =>
-                EF.Functions.Like(s.Nome, dto.SetorNome.Trim())
-            );
-
+            var setor = await _context.Setores.FindAsync(setorId);
             if (setor == null)
-                return BadRequest($"Setor '{dto.SetorNome}' não encontrado. Cadastre-o primeiro.");
+                return BadRequest("Setor não encontrado.");
 
-            var moto = new Moto
-            {
-                Placa = dto.Placa,
-                Status = dto.Status,
-                SetorId = setor.Id,
-            };
-
+            var moto = new Moto { Placa = placa, SetorId = setorId };
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
 
-            var response = new MotoResponseDto
-            {
-                Id = moto.Id,
-                Placa = moto.Placa,
-                Status = moto.Status,
-                SetorId = moto.SetorId,
-                SetorNome = setor.Nome,
-            };
-
-            return CreatedAtAction(nameof(GetById), new { id = moto.Id }, response);
+            return Ok(
+                new MotoDto
+                {
+                    Id = moto.Id,
+                    Placa = moto.Placa,
+                    SetorNome = setor.Nome,
+                }
+            );
         }
 
         // PUT: api/motos/5
@@ -124,7 +109,6 @@ namespace MotoMonitoramento.Controllers
                 return NotFound();
 
             moto.Placa = dto.Placa;
-            moto.Status = dto.Status;
 
             if (!string.IsNullOrWhiteSpace(dto.SetorNome))
             {

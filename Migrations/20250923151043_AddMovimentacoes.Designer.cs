@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotoMonitoramento.Data;
 using Oracle.EntityFrameworkCore.Metadata;
@@ -11,9 +12,11 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace MotoMonitoramento.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250923151043_AddMovimentacoes")]
+    partial class AddMovimentacoes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,6 +41,11 @@ namespace MotoMonitoramento.Migrations
                     b.Property<int?>("SetorId")
                         .HasColumnType("NUMBER(10)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("NVARCHAR2(20)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SetorId");
@@ -59,10 +67,10 @@ namespace MotoMonitoramento.Migrations
                     b.Property<int>("MotoId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("SetorAntigoId")
+                    b.Property<int?>("SetorAntigoId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("SetorNovoId")
+                    b.Property<int?>("SetorNovoId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -138,15 +146,11 @@ namespace MotoMonitoramento.Migrations
 
                     b.HasOne("MotoMonitoramento.Models.Setor", "SetorAntigo")
                         .WithMany()
-                        .HasForeignKey("SetorAntigoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SetorAntigoId");
 
                     b.HasOne("MotoMonitoramento.Models.Setor", "SetorNovo")
                         .WithMany()
-                        .HasForeignKey("SetorNovoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SetorNovoId");
 
                     b.Navigation("Moto");
 

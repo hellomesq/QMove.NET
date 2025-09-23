@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj": {}
+    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\QMove.NET\\MotoMonitoramento.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj": {
+    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\QMove.NET\\MotoMonitoramento.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj",
+        "projectUniqueName": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\QMove.NET\\MotoMonitoramento.csproj",
         "projectName": "MotoMonitoramento",
-        "projectPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj",
+        "projectPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\QMove.NET\\MotoMonitoramento.csproj",
         "packagesPath": "C:\\Users\\Heloisa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\obj\\",
+        "outputPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\QMove.NET\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Heloisa\\AppData\\Roaming\\NuGet\\NuGet.Config"
