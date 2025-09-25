@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Uuiu2r1Hv34=",
+  "dgSpecHash": "9Trrfh1ND60=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\QMove.NET\\MotoMonitoramento.csproj",
+  "projectFilePath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Heloisa\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Heloisa\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.4\\microsoft.aspnetcore.openapi.9.0.4.nupkg.sha512",
