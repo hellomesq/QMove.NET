@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
+using MotoMonitoramento.DTOs;
 using MotoMonitoramento.Models;
 
 namespace MotoMonitoramento.Controllers
@@ -30,14 +31,20 @@ namespace MotoMonitoramento.Controllers
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
                 return NotFound();
-
             return usuario;
         }
 
         // POST: /api/usuarios
         [HttpPost]
-        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        public async Task<ActionResult<Usuario>> PostUsuario([FromBody] UsuarioDto dto)
         {
+            var usuario = new Usuario
+            {
+                Nome = dto.Nome,
+                Email = dto.Email,
+                Senha = dto.Senha,
+            };
+
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
@@ -46,25 +53,17 @@ namespace MotoMonitoramento.Controllers
 
         // PUT: /api/usuarios/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
+        public async Task<IActionResult> PutUsuario(int id, [FromBody] UsuarioDto dto)
         {
-            if (id != usuario.Id)
-                return BadRequest();
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario == null)
+                return NotFound();
 
-            _context.Entry(usuario).State = EntityState.Modified;
+            usuario.Nome = dto.Nome;
+            usuario.Email = dto.Email;
+            usuario.Senha = dto.Senha;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Usuarios.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
-            }
-
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
@@ -78,7 +77,6 @@ namespace MotoMonitoramento.Controllers
 
             _context.Usuarios.Remove(usuario);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

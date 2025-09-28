@@ -75,12 +75,12 @@ namespace MotoMonitoramento.Controllers
             return Ok(motoAtualizada);
         }
 
-        // GET: api/motos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetAll()
         {
             var motos = await _context
-                .Motos.Include(m => m.Setor)
+                .Motos.AsNoTracking()
+                .Include(m => m.Setor)
                 .Select(m => new MotoResponseDto
                 {
                     Id = m.Id,
@@ -100,8 +100,9 @@ namespace MotoMonitoramento.Controllers
         )
         {
             var motos = await _context
-                .Motos.Include(m => m.Setor)
+                .Motos.AsNoTracking()
                 .Where(m => m.SetorId == setorId)
+                .Include(m => m.Setor)
                 .Select(m => new MotoResponseDto
                 {
                     Id = m.Id,
@@ -119,7 +120,8 @@ namespace MotoMonitoramento.Controllers
         public async Task<ActionResult<MotoResponseDto>> GetById(int id)
         {
             var moto = await _context
-                .Motos.Include(m => m.Setor)
+                .Motos.AsNoTracking()
+                .Include(m => m.Setor)
                 .Where(m => m.Id == id)
                 .Select(m => new MotoResponseDto
                 {

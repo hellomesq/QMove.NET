@@ -3,11 +3,14 @@ using MotoMonitoramento.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Oracle EF Core com pooling
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection"))
+// Adiciona DbContext com pooling
+builder.Services.AddDbContextPool<AppDbContext>(options =>
+    options
+        .UseOracle(builder.Configuration.GetConnectionString("OracleConnection"))
+        .EnableSensitiveDataLogging() // útil para debug
 );
 
+// Configura CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -22,8 +25,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Middleware
 app.UseCors("AllowAll");
-
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -36,7 +39,13 @@ app.MapGet("/", () => "API QMove funcionando");
 app.UseAuthorization();
 app.MapControllers();
 
+// Configura porta (para deploy)
 var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
 app.Urls.Add($"http://*:{port}");
+
+// Ativa Hot Reload em dev
+#if DEBUG
+app.UseDeveloperExceptionPage();
+#endif
 
 app.Run();

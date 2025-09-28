@@ -24,13 +24,15 @@ namespace MotoMonitoramento.Controllers
             [FromQuery] int novoSetorId
         )
         {
-            var moto = await _context
-                .Motos.Include(m => m.Setor)
-                .FirstOrDefaultAsync(m => m.Id == motoId);
+            var moto = await _context.Motos.AsNoTracking().FirstOrDefaultAsync(m => m.Id == motoId);
+
             if (moto == null)
                 return NotFound("Moto não encontrada.");
 
-            var setorNovo = await _context.Setores.FindAsync(novoSetorId);
+            var setorNovo = await _context
+                .Setores.AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == novoSetorId);
+
             if (setorNovo == null)
                 return BadRequest("Setor novo não encontrado.");
 
@@ -52,7 +54,7 @@ namespace MotoMonitoramento.Controllers
                 {
                     Id = movimentacao.Id,
                     MotoPlaca = moto.Placa,
-                    SetorAntigo = movimentacao.SetorAntigo?.Nome ?? "N/A",
+                    SetorAntigo = (await _context.Setores.FindAsync(moto.SetorId))?.Nome ?? "N/A",
                     SetorNovo = setorNovo.Nome,
                     DataHora = movimentacao.DataHora,
                 }
@@ -64,24 +66,19 @@ namespace MotoMonitoramento.Controllers
         public async Task<ActionResult<IEnumerable<MovimentacaoDto>>> ListarTodas()
         {
             var movimentacoes = await _context
-                .Movimentacoes.Include(m => m.Moto)
-                .Include(m => m.SetorAntigo)
-                .Include(m => m.SetorNovo)
+                .Movimentacoes.AsNoTracking()
                 .OrderByDescending(m => m.DataHora)
-                .ToListAsync(); // traz para memória
-
-            var dtos = movimentacoes
                 .Select(m => new MovimentacaoDto
                 {
                     Id = m.Id,
                     MotoPlaca = m.Moto.Placa,
-                    SetorAntigo = m.SetorAntigo?.Nome ?? "N/A",
-                    SetorNovo = m.SetorNovo?.Nome ?? "N/A",
+                    SetorAntigo = m.SetorAntigo.Nome ?? "N/A",
+                    SetorNovo = m.SetorNovo.Nome ?? "N/A",
                     DataHora = m.DataHora,
                 })
-                .ToList();
+                .ToListAsync();
 
-            return Ok(dtos);
+            return Ok(movimentacoes);
         }
 
         // GET: api/movimentacoes/por-moto/1
@@ -89,28 +86,23 @@ namespace MotoMonitoramento.Controllers
         public async Task<ActionResult<IEnumerable<MovimentacaoDto>>> ListarPorMoto(int motoId)
         {
             var movimentacoes = await _context
-                .Movimentacoes.Where(m => m.MotoId == motoId)
-                .Include(m => m.Moto)
-                .Include(m => m.SetorAntigo)
-                .Include(m => m.SetorNovo)
+                .Movimentacoes.AsNoTracking()
+                .Where(m => m.MotoId == motoId)
                 .OrderByDescending(m => m.DataHora)
-                .ToListAsync(); // traz para memória
-
-            if (!movimentacoes.Any())
-                return NotFound($"Nenhuma movimentação encontrada para a moto {motoId}.");
-
-            var dtos = movimentacoes
                 .Select(m => new MovimentacaoDto
                 {
                     Id = m.Id,
                     MotoPlaca = m.Moto.Placa,
-                    SetorAntigo = m.SetorAntigo?.Nome ?? "N/A",
-                    SetorNovo = m.SetorNovo?.Nome ?? "N/A",
+                    SetorAntigo = m.SetorAntigo.Nome ?? "N/A",
+                    SetorNovo = m.SetorNovo.Nome ?? "N/A",
                     DataHora = m.DataHora,
                 })
-                .ToList();
+                .ToListAsync();
 
-            return Ok(dtos);
+            if (!movimentacoes.Any())
+                return NotFound($"Nenhuma movimentação encontrada para a moto {motoId}.");
+
+            return Ok(movimentacoes);
         }
 
         // GET: api/movimentacoes/ultima/1
@@ -118,26 +110,23 @@ namespace MotoMonitoramento.Controllers
         public async Task<ActionResult<MovimentacaoDto>> UltimaMovimentacao(int motoId)
         {
             var ultima = await _context
-                .Movimentacoes.Where(m => m.MotoId == motoId)
-                .Include(m => m.Moto)
-                .Include(m => m.SetorAntigo)
-                .Include(m => m.SetorNovo)
+                .Movimentacoes.AsNoTracking()
+                .Where(m => m.MotoId == motoId)
                 .OrderByDescending(m => m.DataHora)
+                .Select(m => new MovimentacaoDto
+                {
+                    Id = m.Id,
+                    MotoPlaca = m.Moto.Placa,
+                    SetorAntigo = m.SetorAntigo.Nome ?? "N/A",
+                    SetorNovo = m.SetorNovo.Nome ?? "N/A",
+                    DataHora = m.DataHora,
+                })
                 .FirstOrDefaultAsync();
 
             if (ultima == null)
                 return NotFound($"Nenhuma movimentação registrada para a moto {motoId}.");
 
-            var dto = new MovimentacaoDto
-            {
-                Id = ultima.Id,
-                MotoPlaca = ultima.Moto.Placa,
-                SetorAntigo = ultima.SetorAntigo?.Nome ?? "N/A",
-                SetorNovo = ultima.SetorNovo?.Nome ?? "N/A",
-                DataHora = ultima.DataHora,
-            };
-
-            return Ok(dto);
+            return Ok(ultima);
         }
     }
 }

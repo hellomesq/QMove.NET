@@ -15,11 +15,17 @@ namespace MotoMonitoramento.Controllers
         public SetoresController(AppDbContext context) => _context = context;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Setor>>> GetAll()
+        public async Task<ActionResult<IEnumerable<SetorResponseDto>>> GetAll()
         {
-            return Ok(await _context.Setores.ToListAsync());
+            var setores = await _context
+                .Setores.AsNoTracking()
+                .Select(s => new SetorResponseDto { Id = s.Id, Nome = s.Nome })
+                .ToListAsync();
+
+            return Ok(setores);
         }
 
+        // POST: api/setores
         [HttpPost]
         public async Task<ActionResult<Setor>> CadastrarSetor([FromBody] SetorDto dto)
         {
@@ -33,6 +39,7 @@ namespace MotoMonitoramento.Controllers
             return CreatedAtAction(nameof(GetAll), new { id = setor.Id }, setor);
         }
 
+        // PUT: api/setores/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] SetorDto dto)
         {
@@ -49,6 +56,7 @@ namespace MotoMonitoramento.Controllers
             return NoContent();
         }
 
+        // DELETE: api/setores/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
