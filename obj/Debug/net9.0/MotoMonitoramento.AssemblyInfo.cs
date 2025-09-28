@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MotoMonitoramento")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77f504db785ebc88c815007292779b5b338ae1be")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4291c6616fad3da318b2fc57edc40ea78669e82")]
 [assembly: System.Reflection.AssemblyProductAttribute("MotoMonitoramento")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MotoMonitoramento")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -12,7 +12,9 @@
           "Microsoft.EntityFrameworkCore.Design": "9.0.5",
           "Microsoft.EntityFrameworkCore.Tools": "9.0.5",
           "Oracle.EntityFrameworkCore": "9.23.80",
-          "Swashbuckle.AspNetCore": "8.1.1"
+          "QRCoder": "1.6.0",
+          "Swashbuckle.AspNetCore": "8.1.1",
+          "System.Drawing.Common": "9.0.9"
         },
         "runtime": {
           "MotoMonitoramento.dll": {}
@@ -515,6 +517,22 @@
           }
         }
       },
+      "Microsoft.Win32.SystemEvents/9.0.9": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Win32.SystemEvents.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41916"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net9.0/Microsoft.Win32.SystemEvents.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41916"
+          }
+        }
+      },
       "Mono.TextTemplating/3.0.0": {
         "dependencies": {
           "System.CodeDom": "6.0.0"
@@ -550,6 +568,14 @@
           "lib/net8.0/Oracle.ManagedDataAccess.dll": {
             "assemblyVersion": "23.1.0.0",
             "fileVersion": "23.1.0.0"
+          }
+        }
+      },
+      "QRCoder/1.6.0": {
+        "runtime": {
+          "lib/net6.0/QRCoder.dll": {
+            "assemblyVersion": "1.6.0.0",
+            "fileVersion": "1.6.0.0"
           }
         }
       },
@@ -717,6 +743,21 @@
             "assetType": "runtime",
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
+      "System.Drawing.Common/9.0.9": {
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "9.0.9"
+        },
+        "runtime": {
+          "lib/net9.0/System.Drawing.Common.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41903"
+          },
+          "lib/net9.0/System.Private.Windows.Core.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41903"
           }
         }
       },
@@ -951,6 +992,13 @@
       "path": "microsoft.openapi/1.6.23",
       "hashPath": "microsoft.openapi.1.6.23.nupkg.sha512"
     },
+    "Microsoft.Win32.SystemEvents/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-eJU9vZbN710Cc25p/jPecPEL+gFcnynAvznNRnEvMU7i7u0PSjFXlGO4SOlaIUvkykTlS2N++M9B/coxYT7aPw==",
+      "path": "microsoft.win32.systemevents/9.0.9",
+      "hashPath": "microsoft.win32.systemevents.9.0.9.nupkg.sha512"
+    },
     "Mono.TextTemplating/3.0.0": {
       "type": "package",
       "serviceable": true,
@@ -971,6 +1019,13 @@
       "sha512": "sha512-wgCcndZnwbWySb4Bm0UOAJO8wOagFAs1IG8Aa4ZX38D9N9MrySfryGKJd+yajb2CDGXv/yL3x7yES6mmF4OMWw==",
       "path": "oracle.manageddataaccess.core/23.8.0",
       "hashPath": "oracle.manageddataaccess.core.23.8.0.nupkg.sha512"
+    },
+    "QRCoder/1.6.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-XmPA81eo+oRxBuyVdswsSkTGTE1d3thfF11Z1PdD7oB56A6HU4G4AAOdySmGRMb/cljwlFTMWUtosGEnwpS6GA==",
+      "path": "qrcoder/1.6.0",
+      "hashPath": "qrcoder.1.6.0.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/8.1.1": {
       "type": "package",
@@ -1083,6 +1138,13 @@
       "sha512": "sha512-puwJxURHDrYLGTQdsHyeMS72ClTqYa4lDYz6LHSbkZEk5hq8H8JfsO4MyYhB5BMMxg93jsQzLUwrnCumj11UIg==",
       "path": "system.directoryservices.protocols/8.0.0",
       "hashPath": "system.directoryservices.protocols.8.0.0.nupkg.sha512"
+    },
+    "System.Drawing.Common/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BS17VFUf4RS9G/JoA6br+79jAjyTj0UaomgXCVNJJn9EWIvmHkn0ZCqAynxwloO00yPIvWgXBF9SBjcM06bl1w==",
+      "path": "system.drawing.common/9.0.9",
+      "hashPath": "system.drawing.common.9.0.9.nupkg.sha512"
     },
     "System.Formats.Asn1/8.0.1": {
       "type": "package",

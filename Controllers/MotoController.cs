@@ -1,8 +1,12 @@
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
 using MotoMonitoramento.Dtos;
 using MotoMonitoramento.Models;
+using QRCoder;
 
 namespace MotoMonitoramento.Controllers
 {
@@ -32,15 +36,31 @@ namespace MotoMonitoramento.Controllers
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
 
-            return Ok(
-                new MotoResponseDto
-                {
-                    Id = moto.Id,
-                    Placa = moto.Placa,
-                    SetorId = setor.Id,
-                    SetorNome = setor.Nome,
-                }
-            );
+            // Gerar QR Code
+            string qrContent = $"https://seusite.com/api/motos/{moto.Id}"; // ou só moto.Id
+            string qrCodeBase64 = GerarQRCodeBase64(qrContent);
+
+            var response = new MotoResponseDto
+            {
+                Id = moto.Id,
+                Placa = moto.Placa,
+                SetorId = setor.Id,
+                SetorNome = setor.Nome,
+                QrCodeBase64 = qrCodeBase64, // novo campo no DTO
+            };
+
+            return Ok(response);
+        }
+
+        private string GerarQRCodeBase64(string conteudo)
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(conteudo, QRCodeGenerator.ECCLevel.Q);
+
+            using var qrCode = new PngByteQRCode(qrCodeData);
+            var qrCodeBytes = qrCode.GetGraphic(20);
+
+            return Convert.ToBase64String(qrCodeBytes);
         }
 
         [HttpPut("{id}")]
@@ -58,6 +78,19 @@ namespace MotoMonitoramento.Controllers
             var setor = await _context.Setores.FindAsync(dto.SetorId);
             if (setor == null)
                 return BadRequest("Setor não encontrado.");
+
+            // Só registra movimentação se o setor mudou
+            if (moto.SetorId != setor.Id)
+            {
+                var movimentacao = new Movimentacao
+                {
+                    MotoId = moto.Id,
+                    SetorAntigoId = moto.SetorId ?? 0,
+                    SetorNovoId = setor.Id,
+                    DataHora = DateTime.UtcNow,
+                };
+                _context.Movimentacoes.Add(movimentacao);
+            }
 
             moto.Placa = dto.Placa;
             moto.SetorId = setor.Id;

@@ -12,5 +12,6 @@ namespace MotoMonitoramento.Dtos
         public string Placa { get; set; } = string.Empty;
         public int? SetorId { get; set; }
         public string? SetorNome { get; set; }
+        public string? QrCodeBase64 { get; set; }
     }
 }
