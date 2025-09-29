@@ -22,6 +22,7 @@ namespace MotoMonitoramento.Controllers
         }
 
         // POST: api/motos
+        // POST: api/motos
         [HttpPost]
         public async Task<ActionResult<MotoResponseDto>> CadastrarMoto([FromBody] MotoDto dto)
         {
@@ -36,8 +37,8 @@ namespace MotoMonitoramento.Controllers
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
 
-            // Gerar QR Code
-            string qrContent = $"https://seusite.com/api/motos/{moto.Id}"; // ou só moto.Id
+            // Gerar QR Code contendo apenas o ID
+            string qrContent = moto.Id.ToString();
             string qrCodeBase64 = GerarQRCodeBase64(qrContent);
 
             var response = new MotoResponseDto
@@ -46,7 +47,7 @@ namespace MotoMonitoramento.Controllers
                 Placa = moto.Placa,
                 SetorId = setor.Id,
                 SetorNome = setor.Nome,
-                QrCodeBase64 = qrCodeBase64, // novo campo no DTO
+                QrCodeBase64 = qrCodeBase64,
             };
 
             return Ok(response);
@@ -111,7 +112,7 @@ namespace MotoMonitoramento.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetAll()
         {
-            var motos = await _context.Motos.AsNoTracking().Include(m => m.Setor).ToListAsync(); // busca tudo primeiro
+            var motos = await _context.Motos.AsNoTracking().Include(m => m.Setor).ToListAsync();
 
             var resultado = motos
                 .Select(m => new MotoResponseDto
@@ -120,7 +121,7 @@ namespace MotoMonitoramento.Controllers
                     Placa = m.Placa,
                     SetorId = m.SetorId,
                     SetorNome = m.Setor != null ? m.Setor.Nome : null,
-                    QrCodeBase64 = GerarQRCodeBase64(m.Id.ToString()),
+                    QrCodeBase64 = GerarQRCodeBase64(m.Id.ToString()), // apenas ID
                 })
                 .ToList();
 
@@ -150,14 +151,13 @@ namespace MotoMonitoramento.Controllers
         }
 
         // GET: api/motos/5
-        // GET: api/motos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MotoResponseDto>> GetById(int id)
         {
             var moto = await _context
                 .Motos.AsNoTracking()
                 .Include(m => m.Setor)
-                .FirstOrDefaultAsync(m => m.Id == id); // busca primeiro
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (moto == null)
                 return NotFound();
@@ -168,7 +168,7 @@ namespace MotoMonitoramento.Controllers
                 Placa = moto.Placa,
                 SetorId = moto.SetorId,
                 SetorNome = moto.Setor?.Nome,
-                QrCodeBase64 = GerarQRCodeBase64(moto.Id.ToString()), // gera QR em memória
+                QrCodeBase64 = GerarQRCodeBase64(moto.Id.ToString()), // apenas ID
             };
 
             return Ok(response);
