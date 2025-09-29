@@ -111,19 +111,20 @@ namespace MotoMonitoramento.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetAll()
         {
-            var motos = await _context
-                .Motos.AsNoTracking()
-                .Include(m => m.Setor)
+            var motos = await _context.Motos.AsNoTracking().Include(m => m.Setor).ToListAsync(); // busca tudo primeiro
+
+            var resultado = motos
                 .Select(m => new MotoResponseDto
                 {
                     Id = m.Id,
                     Placa = m.Placa,
                     SetorId = m.SetorId,
                     SetorNome = m.Setor != null ? m.Setor.Nome : null,
+                    QrCodeBase64 = GerarQRCodeBase64(m.Id.ToString()),
                 })
-                .ToListAsync();
+                .ToList();
 
-            return Ok(motos);
+            return Ok(resultado);
         }
 
         // GET: api/motos/por-setor?setorId=1
@@ -149,23 +150,28 @@ namespace MotoMonitoramento.Controllers
         }
 
         // GET: api/motos/5
+        // GET: api/motos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MotoResponseDto>> GetById(int id)
         {
             var moto = await _context
                 .Motos.AsNoTracking()
                 .Include(m => m.Setor)
-                .Where(m => m.Id == id)
-                .Select(m => new MotoResponseDto
-                {
-                    Id = m.Id,
-                    Placa = m.Placa,
-                    SetorId = m.SetorId,
-                    SetorNome = m.Setor != null ? m.Setor.Nome : null,
-                })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(m => m.Id == id); // busca primeiro
 
-            return moto == null ? NotFound() : Ok(moto);
+            if (moto == null)
+                return NotFound();
+
+            var response = new MotoResponseDto
+            {
+                Id = moto.Id,
+                Placa = moto.Placa,
+                SetorId = moto.SetorId,
+                SetorNome = moto.Setor?.Nome,
+                QrCodeBase64 = GerarQRCodeBase64(moto.Id.ToString()), // gera QR em memória
+            };
+
+            return Ok(response);
         }
 
         // DELETE: api/motos/5
