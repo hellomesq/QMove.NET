@@ -72,6 +72,10 @@
               "target": "Package",
               "version": "[8.1.1, )"
             },
+            "Swashbuckle.AspNetCore.Annotations": {
+              "target": "Package",
+              "version": "[9.0.5, )"
+            },
             "System.Drawing.Common": {
               "target": "Package",
               "version": "[9.0.9, )"

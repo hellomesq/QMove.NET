@@ -7,11 +7,13 @@ using MotoMonitoramento.Data;
 using MotoMonitoramento.Dtos;
 using MotoMonitoramento.Models;
 using QRCoder;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace MotoMonitoramento.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [SwaggerTag("Gerencia motos, incluindo cadastro, atualização, listagem e exclusão")]
     public class MotosController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -21,10 +23,20 @@ namespace MotoMonitoramento.Controllers
             _context = context;
         }
 
-        // POST: api/motos
-        // POST: api/motos
         [HttpPost]
-        public async Task<ActionResult<MotoResponseDto>> CadastrarMoto([FromBody] MotoDto dto)
+        [SwaggerOperation(
+            Summary = "Cadastra uma nova moto",
+            Description = "Recebe dados da moto e retorna a moto cadastrada com QR Code"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Moto cadastrada com sucesso",
+            typeof(MotoResponseDto)
+        )]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Dados inválidos")]
+        public async Task<ActionResult<MotoResponseDto>> CadastrarMoto(
+            [FromBody, SwaggerParameter("Dados da moto", Required = true)] MotoDto dto
+        )
         {
             if (dto == null || string.IsNullOrEmpty(dto.Placa))
                 return BadRequest("Placa é obrigatória.");
@@ -37,7 +49,6 @@ namespace MotoMonitoramento.Controllers
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
 
-            // Gerar QR Code contendo apenas o ID
             string qrContent = moto.Id.ToString();
             string qrCodeBase64 = GerarQRCodeBase64(qrContent);
 
@@ -65,7 +76,21 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<MotoResponseDto>> Update(int id, [FromBody] MotoDto dto)
+        [SwaggerOperation(
+            Summary = "Atualiza uma moto",
+            Description = "Atualiza placa e setor de uma moto"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Moto atualizada com sucesso",
+            typeof(MotoResponseDto)
+        )]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Dados inválidos")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Moto não encontrada")]
+        public async Task<ActionResult<MotoResponseDto>> Update(
+            int id,
+            [FromBody, SwaggerParameter("Dados atualizados da moto", Required = true)] MotoDto dto
+        )
         {
             if (dto == null || string.IsNullOrEmpty(dto.Placa))
                 return BadRequest("Placa é obrigatória.");
@@ -73,6 +98,7 @@ namespace MotoMonitoramento.Controllers
             var moto = await _context
                 .Motos.Include(m => m.Setor)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (moto == null)
                 return NotFound();
 
@@ -80,7 +106,6 @@ namespace MotoMonitoramento.Controllers
             if (setor == null)
                 return BadRequest("Setor não encontrado.");
 
-            // Só registra movimentação se o setor mudou
             if (moto.SetorId != setor.Id)
             {
                 var movimentacao = new Movimentacao
@@ -110,6 +135,15 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Lista todas as motos",
+            Description = "Retorna todas as motos cadastradas"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Lista de motos retornada com sucesso",
+            typeof(IEnumerable<MotoResponseDto>)
+        )]
         public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetAll()
         {
             var motos = await _context.Motos.AsNoTracking().Include(m => m.Setor).ToListAsync();
@@ -121,17 +155,25 @@ namespace MotoMonitoramento.Controllers
                     Placa = m.Placa,
                     SetorId = m.SetorId,
                     SetorNome = m.Setor != null ? m.Setor.Nome : null,
-                    QrCodeBase64 = GerarQRCodeBase64(m.Id.ToString()), // apenas ID
+                    QrCodeBase64 = GerarQRCodeBase64(m.Id.ToString()),
                 })
                 .ToList();
 
             return Ok(resultado);
         }
 
-        // GET: api/motos/por-setor?setorId=1
         [HttpGet("por-setor")]
+        [SwaggerOperation(
+            Summary = "Lista motos por setor",
+            Description = "Retorna todas as motos cadastradas em um setor específico"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Lista de motos retornada com sucesso",
+            typeof(IEnumerable<MotoResponseDto>)
+        )]
         public async Task<ActionResult<IEnumerable<MotoResponseDto>>> GetPorSetor(
-            [FromQuery] int setorId
+            [FromQuery, SwaggerParameter("ID do setor", Required = true)] int setorId
         )
         {
             var motos = await _context
@@ -150,9 +192,20 @@ namespace MotoMonitoramento.Controllers
             return Ok(motos);
         }
 
-        // GET: api/motos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MotoResponseDto>> GetById(int id)
+        [SwaggerOperation(
+            Summary = "Consulta uma moto pelo ID",
+            Description = "Retorna uma moto específica pelo seu ID"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Moto encontrada com sucesso",
+            typeof(MotoResponseDto)
+        )]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Moto não encontrada")]
+        public async Task<ActionResult<MotoResponseDto>> GetById(
+            [FromRoute, SwaggerParameter("ID da moto", Required = true)] int id
+        )
         {
             var moto = await _context
                 .Motos.AsNoTracking()
@@ -168,15 +221,19 @@ namespace MotoMonitoramento.Controllers
                 Placa = moto.Placa,
                 SetorId = moto.SetorId,
                 SetorNome = moto.Setor?.Nome,
-                QrCodeBase64 = GerarQRCodeBase64(moto.Id.ToString()), // apenas ID
+                QrCodeBase64 = GerarQRCodeBase64(moto.Id.ToString()),
             };
 
             return Ok(response);
         }
 
-        // DELETE: api/motos/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [SwaggerOperation(Summary = "Deleta uma moto", Description = "Remove uma moto pelo seu ID")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Moto deletada com sucesso")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Moto não encontrada")]
+        public async Task<IActionResult> Delete(
+            [FromRoute, SwaggerParameter("ID da moto", Required = true)] int id
+        )
         {
             var moto = await _context.Motos.FindAsync(id);
             if (moto == null)

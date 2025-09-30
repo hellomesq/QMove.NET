@@ -583,3 +583,4 @@ C:\Users\Heloisa\Downloads\Faculdade\Challenge\QMove.NET\bin\Debug\net9.0\QRCode
 C:\Users\Heloisa\Downloads\Faculdade\Challenge\QMove.NET\bin\Debug\net9.0\System.Drawing.Common.dll
 C:\Users\Heloisa\Downloads\Faculdade\Challenge\QMove.NET\bin\Debug\net9.0\System.Private.Windows.Core.dll
 C:\Users\Heloisa\Downloads\Faculdade\Challenge\QMove.NET\bin\Debug\net9.0\runtimes\win\lib\net9.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\Heloisa\Downloads\Faculdade\Challenge\QMove.NET\bin\Debug\net9.0\Swashbuckle.AspNetCore.Annotations.dll

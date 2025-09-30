@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
+using Swashbuckle.AspNetCore.Annotations; // ✨ Importante
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,12 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Configura Swagger com Annotations
+builder.Services.AddSwaggerGen(c =>
+{
+    c.EnableAnnotations(); // permite anotações
+});
 
 var app = builder.Build();
 

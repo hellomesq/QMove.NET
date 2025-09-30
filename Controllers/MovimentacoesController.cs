@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
 using MotoMonitoramento.Dtos;
 using MotoMonitoramento.Models;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace MotoMonitoramento.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [SwaggerTag("Gerencia movimentações de motos entre setores")]
     public class MovimentacoesController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -17,11 +19,21 @@ namespace MotoMonitoramento.Controllers
             _context = context;
         }
 
-        // POST: api/movimentacoes
         [HttpPost("movimentacoes")]
+        [SwaggerOperation(
+            Summary = "Registra uma movimentação",
+            Description = "Registra a movimentação de uma moto para um novo setor"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Movimentação registrada com sucesso",
+            typeof(MovimentacaoDto)
+        )]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Dados inválidos")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Moto ou setor não encontrado")]
         public async Task<ActionResult<MovimentacaoDto>> RegistrarMovimentacao(
-            [FromQuery] int motoId,
-            [FromQuery] int novoSetorId
+            [FromQuery, SwaggerParameter("ID da moto", Required = true)] int motoId,
+            [FromQuery, SwaggerParameter("ID do novo setor", Required = true)] int novoSetorId
         )
         {
             var moto = await _context.Motos.AsNoTracking().FirstOrDefaultAsync(m => m.Id == motoId);
@@ -61,8 +73,16 @@ namespace MotoMonitoramento.Controllers
             );
         }
 
-        // GET: api/movimentacoes
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Lista todas as movimentações",
+            Description = "Retorna todas as movimentações registradas"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Lista de movimentações retornada com sucesso",
+            typeof(IEnumerable<MovimentacaoDto>)
+        )]
         public async Task<ActionResult<IEnumerable<MovimentacaoDto>>> ListarTodas()
         {
             var movimentacoes = await _context
@@ -81,9 +101,23 @@ namespace MotoMonitoramento.Controllers
             return Ok(movimentacoes);
         }
 
-        // GET: api/movimentacoes/por-moto/1
         [HttpGet("por-moto/{motoId}")]
-        public async Task<ActionResult<IEnumerable<MovimentacaoDto>>> ListarPorMoto(int motoId)
+        [SwaggerOperation(
+            Summary = "Lista movimentações por moto",
+            Description = "Retorna todas as movimentações de uma moto específica"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Lista de movimentações retornada com sucesso",
+            typeof(IEnumerable<MovimentacaoDto>)
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status404NotFound,
+            "Nenhuma movimentação encontrada para a moto"
+        )]
+        public async Task<ActionResult<IEnumerable<MovimentacaoDto>>> ListarPorMoto(
+            [FromRoute, SwaggerParameter("ID da moto", Required = true)] int motoId
+        )
         {
             var movimentacoes = await _context
                 .Movimentacoes.AsNoTracking()
@@ -105,9 +139,23 @@ namespace MotoMonitoramento.Controllers
             return Ok(movimentacoes);
         }
 
-        // GET: api/movimentacoes/ultima/1
         [HttpGet("ultima/{motoId}")]
-        public async Task<ActionResult<MovimentacaoDto>> UltimaMovimentacao(int motoId)
+        [SwaggerOperation(
+            Summary = "Última movimentação",
+            Description = "Retorna a última movimentação registrada de uma moto"
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status200OK,
+            "Movimentação retornada com sucesso",
+            typeof(MovimentacaoDto)
+        )]
+        [SwaggerResponse(
+            StatusCodes.Status404NotFound,
+            "Nenhuma movimentação encontrada para a moto"
+        )]
+        public async Task<ActionResult<MovimentacaoDto>> UltimaMovimentacao(
+            [FromRoute, SwaggerParameter("ID da moto", Required = true)] int motoId
+        )
         {
             var ultima = await _context
                 .Movimentacoes.AsNoTracking()
