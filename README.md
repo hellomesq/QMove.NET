@@ -79,4 +79,10 @@ POST /api/usuarios
   "senha": "senha123"
 }
  ```
+<img width="1783" height="342" alt="image" src="https://github.com/user-attachments/assets/8b16634e-cc0a-45ed-b0a8-250227338a04" />
+<img width="1792" height="494" alt="image" src="https://github.com/user-attachments/assets/17e49d42-6209-47ec-a85e-ecde34cdc60e" />
+<img width="1795" height="355" alt="image" src="https://github.com/user-attachments/assets/4b46919e-86d8-4360-bf48-fc97a4ee3a75" />
+<img width="1794" height="408" alt="image" src="https://github.com/user-attachments/assets/8d1ffb2d-0c9d-4739-83d0-babb7b50c3a4" />
+
+
 
