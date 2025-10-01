@@ -49,3 +49,34 @@ Com essa solução, é possível rastrear o percurso de cada moto dentro do pát
    ```
    http://localhost/swagger/index.html
    ```
+
+## Testes
+1. De acordo com o fluxo, cadastre primeiro o setor, para organizar o pátio
+ ```
+POST /api/setores
+{
+  "nome": "Disponível"
+}
+   ```
+2. Agora, cadastre a moto e em qual setor ela inicialmente estará
+ ```
+POST /api/motos
+{
+  "placa": "ABC-1234",
+  "setorId": 1
+}
+   ```
+3. Caso queira fazer movimentações, informe o setor antigo e o novo
+ ```
+POST /api/movimentacoes/movimentacoes?motoId={id}&novoSetorId={id}
+ ```
+4. Para acessar o aplicativo e gerenciar o pátio, tenha um usuário
+ ```
+POST /api/usuarios
+{
+  "nome": "João Silva",
+  "email": "joao.silva@email.com",
+  "senha": "senha123"
+}
+ ```
+
