@@ -1,42 +1,30 @@
+# QMOVE
 
-# QMove.NET
+API RESTful para gerenciamento de motos em pátios, com funcionalidades completas de CRUD, utilizando ASP.NET Core, banco de dados Oracle via Entity Framework Core, e documentação automática com Swagger.
 
-API RESTful para gerenciamento de motos, com funcionalidades completas de CRUD, utilizando ASP.NET Core, banco de dados Oracle via Entity Framework Core, e documentação automática com Swagger.
+## Integrantes
 
----
+- Hellen Marinho Cordeiro RM 558841
+- Heloisa Alves de Mesquita RM 559145
 
-## Descrição
+## Justificativa da Arquitetura 
 
-Este projeto oferece uma API para gerenciar motos distribuídas em diferentes setores, permitindo:
+A Mottu enfrenta atualmente dificuldades para localizar rapidamente as motos em seu pátio, impactando a eficiência operacional. Para resolver esse problema, desenvolvemos uma API que possibilita:
 
-- Criar novas motos
-- Consultar todas as motos ou motos filtradas por setor
-- Atualizar informações de uma moto existente
-- Excluir motos
-- Consultar moto por ID
+- Cadastro de motos presentes no pátio;
 
-### Tecnologias utilizadas
+- Gerenciamento de setores para organização física do espaço;
 
-- ASP.NET Core Web API (Controllers)
-- Entity Framework Core com Oracle Database
-- Swagger para documentação interativa da API
+- Registro das movimentações por meio da leitura de QR Codes.
 
----
+Com essa solução, é possível rastrear o percurso de cada moto dentro do pátio, garantindo maior controle e agilidade nas operações. 
 
-## Como rodar o projeto
-
-### Pré-requisitos
-
-- [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) (ou superior)
-- Banco de dados Oracle acessível
-- EF Core Tools (opcional, para gerenciar migrations)
-
-### Passos
+## Como rodar a API
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seuusuario/MotoMonitoramento.git
-   cd MotoMonitoramento
+   git clone https://github.com/hellomesq/QMove.NET
+   cd QMove.NET
    ```
 
 2. Configure a connection string do Oracle no arquivo `appsettings.json`:
@@ -46,7 +34,7 @@ Este projeto oferece uma API para gerenciar motos distribuídas em diferentes se
    }
    ```
 
-3. (Opcional) Crie o banco de dados e aplique as migrations:
+3. Crie o banco de dados e aplique as migrations:
    ```bash
    dotnet ef migrations add InitialCreate
    dotnet ef database update
@@ -59,27 +47,5 @@ Este projeto oferece uma API para gerenciar motos distribuídas em diferentes se
 
 5. Acesse a documentação Swagger para explorar e testar as rotas:
    ```
-   http://localhost:<porta>/swagger/index.html
+   http://localhost/swagger/index.html
    ```
-
----
-
-## Endpoints da API
-
-| GET    | `/api/motos`           | Retorna todas as motos           
-| GET    | `/api/motos/por-setor` | Retorna motos filtradas por setor
-| GET    | `/api/motos/{id}`      | Retorna moto pelo ID             
-| POST   | `/api/motos`           | Cria uma nova moto               
-| PUT    | `/api/motos/{id}`      | Atualiza moto pelo ID             
-| DELETE | `/api/motos/{id}`      | Exclui moto pelo ID              
-
-### Exemplo JSON para POST e PUT
-
-```json
-{
-  "placa": "ABC1234",
-  "status": "No patio",
-  "setor": "Disponivel"
-}
-```
-
