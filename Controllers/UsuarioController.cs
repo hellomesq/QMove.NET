@@ -8,7 +8,8 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace MotoMonitoramento.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [SwaggerTag("Gerencia operações relacionadas a usuários")]
     public class UsuariosController : ControllerBase
     {
