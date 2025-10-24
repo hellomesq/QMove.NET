@@ -15,5 +15,9 @@ namespace MotoMonitoramento.Models
 
         [Required]
         public required string Senha { get; set; }
+
+        // Refresh Token
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,16 +38,12 @@ namespace MotoMonitoramento.Controllers
             if (usuario == null)
                 return Unauthorized("Email ou senha inválidos.");
 
-            // Pega a chave do JWT via IConfiguration
             var config = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-            var keyString = config["Jwt:Key"];
-            var issuer = config["Jwt:Issuer"];
-
-            if (string.IsNullOrWhiteSpace(keyString) || string.IsNullOrWhiteSpace(issuer))
-                throw new InvalidOperationException("JWT Key ou Issuer não definidos!");
-
+            var keyString = config["Jwt:Key"]!;
+            var issuer = config["Jwt:Issuer"]!;
             var key = Encoding.UTF8.GetBytes(keyString);
 
+            // ---------------- JWT Curto ----------------
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -58,7 +55,7 @@ namespace MotoMonitoramento.Controllers
                         new Claim(ClaimTypes.Email, usuario.Email),
                     }
                 ),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddMinutes(15), // token curto
                 Issuer = issuer,
                 Audience = issuer,
                 SigningCredentials = new SigningCredentials(
@@ -70,12 +67,66 @@ namespace MotoMonitoramento.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwt = tokenHandler.WriteToken(token);
 
-            return Ok(new { Token = jwt });
+            // ---------------- Refresh Token ----------------
+            var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            usuario.RefreshToken = refreshToken;
+            usuario.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // 7 dias de validade
+            await _context.SaveChangesAsync();
+
+            return Ok(new TokenResponseDto { AccessToken = jwt, RefreshToken = refreshToken });
         }
 
         // =================== ENDPOINTS ===================
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto dto)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u =>
+                u.RefreshToken == dto.RefreshToken
+            );
+
+            if (usuario == null || usuario.RefreshTokenExpiryTime < DateTime.UtcNow)
+                return Unauthorized("Refresh token inválido ou expirado.");
+
+            var config = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            var keyString = config["Jwt:Key"]!;
+            var issuer = config["Jwt:Issuer"]!;
+            var key = Encoding.UTF8.GetBytes(keyString);
+
+            // Gera novo JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                        new Claim(ClaimTypes.Name, usuario.Nome),
+                        new Claim(ClaimTypes.Email, usuario.Email),
+                    }
+                ),
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                Issuer = issuer,
+                Audience = issuer,
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256
+                ),
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
+
+            var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            usuario.RefreshToken = refreshToken;
+            usuario.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _context.SaveChangesAsync();
+
+            return Ok(new TokenResponseDto { AccessToken = jwt, RefreshToken = refreshToken });
+        }
+
         [HttpGet]
-        [Authorize] // agora precisa de token para acessar
+        [Authorize]
         [SwaggerOperation(
             Summary = "Lista todos os usuários",
             Description = "Retorna todos os usuários cadastrados"

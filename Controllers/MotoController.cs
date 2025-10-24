@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
@@ -25,6 +26,7 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Cadastra uma nova moto",
             Description = "Recebe dados da moto e retorna a moto cadastrada com QR Code"
@@ -77,6 +79,7 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Atualiza uma moto",
             Description = "Atualiza placa e setor de uma moto"
@@ -229,6 +232,7 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         [SwaggerOperation(Summary = "Deleta uma moto", Description = "Remove uma moto pelo seu ID")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Moto deletada com sucesso")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Moto não encontrada")]

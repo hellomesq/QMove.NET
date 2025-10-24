@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoMonitoramento.Data;
@@ -21,6 +22,7 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPost("movimentacoes")]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Registra uma movimentação",
             Description = "Registra a movimentação de uma moto para um novo setor"
