@@ -1,5 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MotoMonitoramento.Data;
 using MotoMonitoramento.DTOs;
 using MotoMonitoramento.Models;
@@ -20,7 +25,57 @@ namespace MotoMonitoramento.Controllers
             _context = context;
         }
 
+        // =================== LOGIN ===================
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u =>
+                u.Email == dto.Email && u.Senha == dto.Senha
+            );
+
+            if (usuario == null)
+                return Unauthorized("Email ou senha inválidos.");
+
+            // Pega a chave do JWT via IConfiguration
+            var config = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            var keyString = config["Jwt:Key"];
+            var issuer = config["Jwt:Issuer"];
+
+            if (string.IsNullOrWhiteSpace(keyString) || string.IsNullOrWhiteSpace(issuer))
+                throw new InvalidOperationException("JWT Key ou Issuer não definidos!");
+
+            var key = Encoding.UTF8.GetBytes(keyString);
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                        new Claim(ClaimTypes.Name, usuario.Nome),
+                        new Claim(ClaimTypes.Email, usuario.Email),
+                    }
+                ),
+                Expires = DateTime.UtcNow.AddHours(1),
+                Issuer = issuer,
+                Audience = issuer,
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256
+                ),
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
+
+            return Ok(new { Token = jwt });
+        }
+
+        // =================== ENDPOINTS ===================
         [HttpGet]
+        [Authorize] // agora precisa de token para acessar
         [SwaggerOperation(
             Summary = "Lista todos os usuários",
             Description = "Retorna todos os usuários cadastrados"
@@ -36,15 +91,14 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Busca usuário por ID",
             Description = "Retorna um usuário específico pelo seu ID"
         )]
         [SwaggerResponse(StatusCodes.Status200OK, "Usuário encontrado", typeof(Usuario))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Usuário não encontrado")]
-        public async Task<ActionResult<Usuario>> GetUsuario(
-            [FromRoute, SwaggerParameter("ID do usuário", Required = true)] int id
-        )
+        public async Task<ActionResult<Usuario>> GetUsuario([FromRoute] int id)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
@@ -53,6 +107,7 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [SwaggerOperation(
             Summary = "Cadastra um novo usuário",
             Description = "Adiciona um novo usuário ao sistema"
@@ -63,9 +118,7 @@ namespace MotoMonitoramento.Controllers
             typeof(Usuario)
         )]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Dados inválidos")]
-        public async Task<ActionResult<Usuario>> PostUsuario(
-            [FromBody, SwaggerParameter("Dados do usuário", Required = true)] UsuarioDto dto
-        )
+        public async Task<ActionResult<Usuario>> PostUsuario([FromBody] UsuarioDto dto)
         {
             var usuario = new Usuario
             {
@@ -81,18 +134,12 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Atualiza um usuário",
             Description = "Altera os dados de um usuário existente"
         )]
-        [SwaggerResponse(StatusCodes.Status204NoContent, "Usuário atualizado com sucesso")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Dados inválidos")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Usuário não encontrado")]
-        public async Task<IActionResult> PutUsuario(
-            [FromRoute, SwaggerParameter("ID do usuário", Required = true)] int id,
-            [FromBody, SwaggerParameter("Dados atualizados do usuário", Required = true)]
-                UsuarioDto dto
-        )
+        public async Task<IActionResult> PutUsuario(int id, [FromBody] UsuarioDto dto)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
@@ -107,15 +154,12 @@ namespace MotoMonitoramento.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Deleta um usuário",
             Description = "Remove um usuário do sistema"
         )]
-        [SwaggerResponse(StatusCodes.Status204NoContent, "Usuário removido com sucesso")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Usuário não encontrado")]
-        public async Task<IActionResult> DeleteUsuario(
-            [FromRoute, SwaggerParameter("ID do usuário", Required = true)] int id
-        )
+        public async Task<IActionResult> DeleteUsuario(int id)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
