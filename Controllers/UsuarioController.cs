@@ -157,6 +157,32 @@ namespace MotoMonitoramento.Controllers
             return usuario;
         }
 
+        [HttpGet("perfil")]
+        [Authorize]
+        public async Task<IActionResult> GetUsuarioPerfil()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("Usuário não identificado.");
+
+            int userId = int.Parse(userIdClaim);
+
+            var usuario = await _context.Usuarios.FindAsync(userId);
+            if (usuario == null)
+                return NotFound("Usuário não encontrado.");
+
+            return Ok(
+                new
+                {
+                    usuario.Id,
+                    usuario.Nome,
+                    usuario.Email,
+                    usuario.Senha,
+                }
+            );
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [SwaggerOperation(
