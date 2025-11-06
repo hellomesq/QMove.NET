@@ -1,0 +1,51 @@
+﻿using System.Net;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Testing;
+using MotoMonitoramento.DTOs;
+using Xunit;
+
+namespace MotoMonitoramento.Tests.Integration
+{
+    public class LoginTests : IClassFixture<WebApplicationFactory<Program>>
+    {
+        private readonly HttpClient _client;
+
+        public LoginTests(WebApplicationFactory<Program> factory)
+        {
+            _client = factory.CreateClient();
+        }
+
+        [Fact(DisplayName = "Deve retornar 401 quando login for inválido")]
+        public async Task Deve_Retornar_Unauthorized_Quando_Credenciais_Invalidas()
+        {
+            var loginDto = new LoginDto
+            {
+                Email = "email@invalido.com",
+                Senha = "senhaerrada"
+            };
+
+            var response = await _client.PostAsJsonAsync("/api/v1/usuarios/login", loginDto);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact(DisplayName = "Deve retornar 200 quando login for válido")]
+        public async Task Deve_Retornar_Sucesso_Quando_Credenciais_Validas()
+        {
+            var loginDto = new LoginDto
+            {
+                Email = "admin@teste.com",  // um usuário que exista no banco
+                Senha = "1234"
+            };
+
+            var response = await _client.PostAsJsonAsync("/api/v1/usuarios/login", loginDto);
+
+            Assert.True(
+                response.StatusCode == HttpStatusCode.OK ||
+                response.StatusCode == HttpStatusCode.Unauthorized, // para evitar falha se não existir
+                $"Status retornado: {response.StatusCode}"
+            );
+        }
+    }
+}

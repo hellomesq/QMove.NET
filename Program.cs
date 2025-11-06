@@ -122,3 +122,5 @@ app.UseDeveloperExceptionPage();
 #endif
 
 app.Run();
+
+public partial class Program { }

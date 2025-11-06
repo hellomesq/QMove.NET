@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj": {}
+    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET-1\\MotoMonitoramento.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj": {
+    "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET-1\\MotoMonitoramento.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj",
+        "projectUniqueName": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET-1\\MotoMonitoramento.csproj",
         "projectName": "MotoMonitoramento",
-        "projectPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj",
+        "projectPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET-1\\MotoMonitoramento.csproj",
         "packagesPath": "C:\\Users\\Heloisa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\obj\\",
+        "outputPath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET-1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Heloisa\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -44,7 +44,15 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "FluentAssertions": {
+              "target": "Package",
+              "version": "[8.8.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.AspNetCore.Mvc.Testing": {
               "target": "Package",
               "version": "[9.0.10, )"
             },
@@ -76,6 +84,10 @@
               "target": "Package",
               "version": "[8.14.0, )"
             },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[18.0.0, )"
+            },
             "Oracle.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.23.80, )"
@@ -99,6 +111,16 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.14.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.3, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.5, )"
             }
           },
           "imports": [
