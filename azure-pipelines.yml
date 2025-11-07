@@ -1,89 +1,65 @@
-# ==============================
-# 🚀 PIPELINE CI/CD - QMove
-# ==============================
+# ============================================
+# 🚀 PIPELINE DE CI/CD - PROJETO MOTO MONITORAMENTO
+# ============================================
 
 trigger:
   branches:
     include:
-      - main
-      - master
+      - main   # executa automaticamente quando há push na main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'  # usa agente Windows com .NET instalado
 
+variables:
+  buildConfiguration: 'Release'
+
+# =============================
+# 🧱 ETAPA 1: RESTAURAR E COMPILAR
+# =============================
 steps:
-  # ==============================
-  # 📦 CHECKOUT
-  # ==============================
-  - checkout: self
-    displayName: '📦 Checkout do repositório'
+- task: UseDotNet@2
+  displayName: '🔧 Configurar versão do .NET SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'   # ou a versão que seu projeto usa
 
-  # ==============================
-  # ⚙️ CONFIGURAÇÃO DO .NET E DOCKER
-  # ==============================
-  - task: UseDotNet@2
-    displayName: '⚙️ Instalar .NET SDK 9.0'
-    inputs:
-      packageType: 'sdk'
-      version: '9.0.x'
+- script: |
+    echo "🔍 Restaurando dependências..."
+    dotnet restore
+  displayName: '📦 Restaurar pacotes NuGet'
 
-  - task: DockerInstaller@0
-    displayName: '🐳 Instalar Docker'
+- script: |
+    echo "🏗️ Compilando solução..."
+    dotnet build --configuration $(buildConfiguration) --no-restore
+  displayName: '⚙️ Compilar projeto'
 
-  # ==============================
-  # 🔧 RESTAURAR E COMPILAR
-  # ==============================
-  - script: |
-      dotnet restore MotoMonitoramento.sln
-    displayName: '📥 Restaurar dependências .NET'
+# =============================
+# 🧪 ETAPA 2: EXECUTAR TESTES AUTOMATIZADOS
+# =============================
+- script: |
+    echo "🚀 Executando testes Unitários..."
+    dotnet test MotoMonitoramento.Tests.Unit/MotoMonitoramento.Tests.Unit.csproj --configuration $(buildConfiguration) --no-build --verbosity normal --logger "trx;LogFileName=unit-tests.trx"
 
-  - script: |
-      dotnet build MotoMonitoramento.sln --no-restore --configuration Release
-    displayName: '🏗️ Compilar projeto .NET'
+    echo "🚀 Executando testes de Integração..."
+    dotnet test MotoMonitoramento.Tests.Integration/MotoMonitoramento.Tests.Integration.csproj --configuration $(buildConfiguration) --no-build --verbosity normal --logger "trx;LogFileName=integration-tests.trx"
+  displayName: '🧪 Executar testes automatizados'
 
-  # ==============================
-  # 🧪 TESTES AUTOMATIZADOS
-  # ==============================
-  - script: |
-      dotnet test MotoMonitoramento.sln --no-build --verbosity normal --logger trx
-    displayName: '🧪 Executar testes automatizados'
+# =============================
+# 📊 ETAPA 3: PUBLICAR RESULTADOS DOS TESTES
+# =============================
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/*.trx'  # procura os resultados gerados pelos testes
+    failTaskOnFailedTests: true
+  displayName: '📊 Publicar resultados dos testes'
 
-  # ==============================
-  # 📦 PUBLICAR ARTEFATO DO BUILD
-  # ==============================
-  - script: |
-      dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
-    displayName: '📦 Publicar artefato'
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'drop'
-    displayName: '📤 Enviar artefato para Azure DevOps'
-
-  # ==============================
-  # 🚀 BUILD + PUSH DA IMAGEM DOCKER PARA O ACR
-  # ==============================
-  - task: AzureCLI@2
-    displayName: '🐳 Build e Push da imagem Docker para o ACR'
-    inputs:
-      azureSubscription: 'qmove-azure-connection'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        chmod +x ./build.sh
-        ./build.sh
-
-  # ==============================
-  # ☁️ DEPLOY AUTOMÁTICO (CD)
-  # ==============================
-  - task: AzureCLI@2
-    displayName: '☁️ Executar deploy via Azure CLI'
-    inputs:
-      azureSubscription: 'qmove-azure-connection'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        chmod +x ./deploy.sh
-        ./deploy.sh
-
+# =============================
+# 📦 ETAPA 4: PUBLICAR ARTEFATOS (opcional)
+# =============================
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: '📦 Publicar artefatos de build (opcional)'
