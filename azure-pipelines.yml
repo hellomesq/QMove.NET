@@ -21,7 +21,7 @@ steps:
   displayName: '🔧 Configurar versão do .NET SDK'
   inputs:
     packageType: 'sdk'
-    version: '8.0.x'   # ou a versão que seu projeto usa
+    version: '9.0.x'   
 
 - script: |
     echo "🔍 Restaurando dependências..."
