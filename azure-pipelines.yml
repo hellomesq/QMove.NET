@@ -1,3 +1,7 @@
+# ==============================
+# 🚀 PIPELINE CI/CD - QMove
+# ==============================
+
 trigger:
   branches:
     include:
@@ -8,43 +12,60 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+  # ==============================
+  # 📦 CHECKOUT
+  # ==============================
   - checkout: self
     displayName: '📦 Checkout do repositório'
 
+  # ==============================
+  # ⚙️ CONFIGURAÇÃO DO .NET E DOCKER
+  # ==============================
   - task: UseDotNet@2
-    displayName: '⚙️ Instalar .NET SDK'
+    displayName: '⚙️ Instalar .NET SDK 9.0'
     inputs:
       packageType: 'sdk'
       version: '9.0.x'
 
-  - script: dotnet restore
-    displayName: '🧩 Restaurar dependências'
-
-  - script: dotnet test --no-build --verbosity normal --logger trx
-    displayName: '🧪 Executar testes automatizados'
-
-  - task: PublishTestResults@2
-    displayName: '📊 Publicar resultados dos testes'
-    inputs:
-      testResultsFormat: 'VSTest'
-      testResultsFiles: '**/TestResults/*.trx'
-    condition: succeededOrFailed()
-
-  - script: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
-    displayName: '📦 Gerar artefato da aplicação'
-
-  - task: PublishBuildArtifacts@1
-    displayName: '🚀 Publicar artefato no Azure DevOps'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'drop'
-      publishLocation: 'Container'
-
   - task: DockerInstaller@0
     displayName: '🐳 Instalar Docker'
 
+  # ==============================
+  # 🔧 RESTAURAR E COMPILAR
+  # ==============================
+  - script: |
+      dotnet restore
+    displayName: '📥 Restaurar dependências .NET'
+
+  - script: |
+      dotnet build --no-restore --configuration Release
+    displayName: '🏗️ Compilar projeto .NET'
+
+  # ==============================
+  # 🧪 TESTES AUTOMATIZADOS
+  # ==============================
+  - script: |
+      dotnet test --no-build --verbosity normal --logger trx
+    displayName: '🧪 Executar testes automatizados'
+
+  # ==============================
+  # 📦 PUBLICAR ARTEFATO DO BUILD
+  # ==============================
+  - script: |
+      dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
+    displayName: '📦 Publicar artefato'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'drop'
+    displayName: '📤 Enviar artefato para Azure DevOps'
+
+  # ==============================
+  # 🚀 BUILD + PUSH DA IMAGEM DOCKER PARA O ACR
+  # ==============================
   - task: AzureCLI@2
-    displayName: '🚀 Build e push das imagens para o ACR'
+    displayName: '🐳 Build e Push da imagem Docker para o ACR'
     inputs:
       azureSubscription: 'qmove-azure-connection'
       scriptType: 'bash'
@@ -53,6 +74,9 @@ steps:
         chmod +x ./build.sh
         ./build.sh
 
+  # ==============================
+  # ☁️ DEPLOY AUTOMÁTICO (CD)
+  # ==============================
   - task: AzureCLI@2
     displayName: '☁️ Executar deploy via Azure CLI'
     inputs:
@@ -62,3 +86,4 @@ steps:
       inlineScript: |
         chmod +x ./deploy.sh
         ./deploy.sh
+
