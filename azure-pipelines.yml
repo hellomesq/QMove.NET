@@ -24,7 +24,8 @@ stages:
           - task: UseDotNet@2
             inputs:
               packageType: 'sdk'
-              version: '8.0.x'
+              version: '9.0.x'
+              
 
           # 2. Restaura dependências
           - script: dotnet restore
