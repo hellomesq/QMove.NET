@@ -10,6 +10,15 @@ using Swashbuckle.AspNetCore.Annotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "3306";
+var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "qmove";
+var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? "root";
+var dbPass = Environment.GetEnvironmentVariable("DB_PASS") ?? "root123";
+
+var connectionString =
+    $"server={dbHost};port={dbPort};database={dbName};user={dbUser};password={dbPass}";
+
 // Banco de dados Oracle
 builder.Services.AddDbContextPool<AppDbContext>(options =>
     options

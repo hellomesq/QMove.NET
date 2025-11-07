@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9/UyBnc42W0=",
+  "dgSpecHash": "nXJD7SuYx8w=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET-1\\MotoMonitoramento.csproj",
+  "projectFilePath": "C:\\Users\\Heloisa\\Downloads\\Faculdade\\Challenge\\QMove.NET\\MotoMonitoramento.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Heloisa\\.nuget\\packages\\fluentassertions\\8.8.0\\fluentassertions.8.8.0.nupkg.sha512",
     "C:\\Users\\Heloisa\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
