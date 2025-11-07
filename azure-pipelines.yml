@@ -5,10 +5,10 @@
 trigger:
   branches:
     include:
-      - main   # executa automaticamente quando há push na main
+      - main
 
 pool:
-  vmImage: 'windows-latest'  # usa agente Windows com .NET instalado
+  vmImage: 'windows-latest'
 
 variables:
   buildConfiguration: 'Release'
@@ -21,28 +21,32 @@ steps:
   displayName: '🔧 Configurar versão do .NET SDK'
   inputs:
     packageType: 'sdk'
-    version: '9.0.x'   
+    version: '9.0.x'
 
 - script: |
     echo "🔍 Restaurando dependências..."
-    dotnet restore
+    dotnet restore MotoMonitoramento.sln
   displayName: '📦 Restaurar pacotes NuGet'
 
 - script: |
     echo "🏗️ Compilando solução..."
-    dotnet build --configuration $(buildConfiguration) --no-restore
+    dotnet build MotoMonitoramento.sln --configuration $(buildConfiguration) --no-restore
   displayName: '⚙️ Compilar projeto'
 
-# =============================
-# 🧪 ETAPA 2: EXECUTAR TESTES AUTOMATIZADOS
-# =============================
+# ==============================
+# 🧪 TESTES AUTOMATIZADOS
+# ==============================
 - script: |
     echo "🚀 Executando testes Unitários..."
-    dotnet test MotoMonitoramento.Tests.Unit/MotoMonitoramento.Tests.Unit.csproj --configuration $(buildConfiguration) --no-build --verbosity normal --logger "trx;LogFileName=unit-tests.trx"
+    dotnet test tests/MotoMonitoramento.Tests.Unit/MotoMonitoramento.Tests.Unit.csproj --no-build --verbosity normal --logger trx
+  displayName: '🧪 Testes Unitários'
+  continueOnError: false
 
+- script: |
     echo "🚀 Executando testes de Integração..."
-    dotnet test MotoMonitoramento.Tests.Integration/MotoMonitoramento.Tests.Integration.csproj --configuration $(buildConfiguration) --no-build --verbosity normal --logger "trx;LogFileName=integration-tests.trx"
-  displayName: '🧪 Executar testes automatizados'
+    dotnet test tests/MotoMonitoramento.Tests.Integration/MotoMonitoramento.Tests.Integration.csproj --no-build --verbosity normal --logger trx
+  displayName: '🔬 Testes de Integração'
+  continueOnError: false
 
 # =============================
 # 📊 ETAPA 3: PUBLICAR RESULTADOS DOS TESTES
@@ -50,7 +54,7 @@ steps:
 - task: PublishTestResults@2
   inputs:
     testResultsFormat: 'VSTest'
-    testResultsFiles: '**/*.trx'  # procura os resultados gerados pelos testes
+    testResultsFiles: '**/*.trx'
     failTaskOnFailedTests: true
   displayName: '📊 Publicar resultados dos testes'
 
