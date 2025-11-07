@@ -34,18 +34,18 @@ steps:
   # 🔧 RESTAURAR E COMPILAR
   # ==============================
   - script: |
-      dotnet restore
+      dotnet restore MotoMonitoramento.sln
     displayName: '📥 Restaurar dependências .NET'
 
   - script: |
-      dotnet build --no-restore --configuration Release
+      dotnet build MotoMonitoramento.sln --no-restore --configuration Release
     displayName: '🏗️ Compilar projeto .NET'
 
   # ==============================
   # 🧪 TESTES AUTOMATIZADOS
   # ==============================
   - script: |
-      dotnet test --no-build --verbosity normal --logger trx
+      dotnet test MotoMonitoramento.sln --no-build --verbosity normal --logger trx
     displayName: '🧪 Executar testes automatizados'
 
   # ==============================
