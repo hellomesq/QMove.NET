@@ -9,8 +9,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  MYSQL_ROOT_PASSWORD: $(MYSQL_ROOT_PASSWORD)
-  DB_DATABASE: $(DB_DATABASE)
 
 stages:
   # CI - Build + Test + Artifact
