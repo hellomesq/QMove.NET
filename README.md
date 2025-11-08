@@ -50,39 +50,63 @@ Com essa solução, é possível rastrear o percurso de cada moto dentro do pát
    http://localhost/swagger/index.html
    ```
 
-## Testes
-1. De acordo com o fluxo, cadastre primeiro o setor, para organizar o pátio
- ```
-POST /api/setores
+## Fluxo de uso 
+
+#### Login
+Para operações autenticadas, faça login para obter o token JWT:
+```
+POST /api/v{version}/Usuarios/login
 {
-  "nome": "Disponível"
+  "email": "usuario@email.com",
+  "senha": "senha123"
 }
-   ```
-2. Agora, cadastre a moto e em qual setor ela inicialmente estará
- ```
-POST /api/motos
-{
-  "placa": "ABC-1234",
-  "setorId": 1
-}
-   ```
-3. Caso queira fazer movimentações, informe o setor antigo e o novo
- ```
-POST /api/movimentacoes/movimentacoes?motoId={id}&novoSetorId={id}
- ```
-4. Para acessar o aplicativo e gerenciar o pátio, tenha um usuário
- ```
-POST /api/usuarios
+```
+- Resposta: token JWT, usado no header Authorization: Bearer {token}
+
+#### Cadastro de Usuário
+Para gerenciar o pátio, tenha um usuário
+```
+POST /api/v{version}/Usuarios
 {
   "nome": "João Silva",
   "email": "joao.silva@email.com",
   "senha": "senha123"
 }
- ```
-<img width="1783" height="342" alt="image" src="https://github.com/user-attachments/assets/8b16634e-cc0a-45ed-b0a8-250227338a04" />
-<img width="1792" height="494" alt="image" src="https://github.com/user-attachments/assets/17e49d42-6209-47ec-a85e-ecde34cdc60e" />
-<img width="1795" height="355" alt="image" src="https://github.com/user-attachments/assets/4b46919e-86d8-4360-bf48-fc97a4ee3a75" />
-<img width="1794" height="408" alt="image" src="https://github.com/user-attachments/assets/8d1ffb2d-0c9d-4739-83d0-babb7b50c3a4" />
+```
 
+#### Cadastro de Setor
+De acordo com o fluxo, cadastre primeiro o setor, para organizar o pátio
+```
+POST /api/v{version}/Setores
+{
+  "nome": "Setor A"
+}
+```
 
+#### Cadastro de Motocicleta
+Cadastre a moto e em qual setor ela inicialmente estará
+```
+POST /api/v{version}/Motos
+{
+  "placa": "ABC-1234",
+  "setorId": 1
+}
+```
 
+#### Consulta de Movimentações 
+Caso queira fazer movimentações, informe o setor antigo e o novo
+```
+GET /api/v{version}/Movimentacoes/por-moto/1
+```
+
+#### Teste de ping
+```
+GET /api/v{version}/Teste/ping
+```
+- Resposta: API QMove funcionando!
+  
+## Endpoints 
+<img width="1436" height="493" alt="image" src="https://github.com/user-attachments/assets/ff08f91a-b493-4e2a-8d09-61c56a59d4b7" />
+<img width="1466" height="399" alt="image" src="https://github.com/user-attachments/assets/b2a9ac31-c040-4c15-aee5-f8b45a1c9f52" />
+<img width="1429" height="266" alt="image" src="https://github.com/user-attachments/assets/3efa8970-ae27-4b36-9cfa-b8bc913d6628" />
+<img width="1446" height="285" alt="image" src="https://github.com/user-attachments/assets/cb517a34-318a-4e6b-b6d0-105179d70a92" />
