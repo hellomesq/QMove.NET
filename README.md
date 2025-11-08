@@ -19,6 +19,27 @@ A Mottu enfrenta atualmente dificuldades para localizar rapidamente as motos em 
 
 Com essa solução, é possível rastrear o percurso de cada moto dentro do pátio, garantindo maior controle e agilidade nas operações. 
 
+## Como rodar os testes
+A solução possui dois tipos de testes:
+- Unitários: testam classes e métodos isoladamente, sem depender de banco de dados ou servidor HTTP.
+- Integração: simulam chamadas HTTP para a API usando WebApplicationFactory, testando fluxo completo.
+
+1. Dentro do terminal, execute na raiz do projeto para rodar todos os testes
+   ```bash
+   dotnet test
+   ```
+2. Para rodar apenas os testes unitários
+   ```bash
+   dotnet test tests/MotoMonitoramento.Tests.Unit
+   ```
+3. Para rodar apenas os testes de integração
+   ```bash
+   dotnet test tests/MotoMonitoramento.Tests.Integration
+   ```
+Exemplos de testes implementados:
+- LoginTests: login inválido retorna 401 Unauthorized
+- UsuarioServiceTests: valida criação de usuário, alteração de senha, validação de e-mail e falha para email inválido
+
 ## Como rodar a API
 
 1. Clone o repositório:
@@ -106,7 +127,9 @@ GET /api/v{version}/Teste/ping
 - Resposta: API QMove funcionando!
   
 ## Endpoints 
-<img width="1436" height="493" alt="image" src="https://github.com/user-attachments/assets/ff08f91a-b493-4e2a-8d09-61c56a59d4b7" />
-<img width="1466" height="399" alt="image" src="https://github.com/user-attachments/assets/b2a9ac31-c040-4c15-aee5-f8b45a1c9f52" />
-<img width="1429" height="266" alt="image" src="https://github.com/user-attachments/assets/3efa8970-ae27-4b36-9cfa-b8bc913d6628" />
-<img width="1446" height="285" alt="image" src="https://github.com/user-attachments/assets/cb517a34-318a-4e6b-b6d0-105179d70a92" />
+<img width="488" height="481" alt="image" src="https://github.com/user-attachments/assets/8cadc374-febe-4bc9-8b5a-23496307a6df" />
+<img width="455" height="261" alt="image" src="https://github.com/user-attachments/assets/be0d4dca-c728-4f6f-9c55-45c223323c2a" />
+<img width="519" height="377" alt="image" src="https://github.com/user-attachments/assets/9d0b7457-a002-4453-b70e-0e1591c7eaca" />
+<img width="703" height="272" alt="image" src="https://github.com/user-attachments/assets/f38da993-49f4-4177-9a49-15a841cc4a6a" />
+
+
